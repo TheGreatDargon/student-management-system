@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <h1 class="text-3xl font-bold text-center bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent mb-8">Staff Login</h1>
+    <form method="POST" action="{{ url_for('login') }}" class="bg-white bg-opacity-95 rounded-xl shadow-lg p-6 backdrop-blur-md">
+        <div class="mb-6">
+            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter Username" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50">
+        </div>
+        <div class="mb-6">
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter Password" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50">
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-transform transform hover:scale-105">Login</button>
+    </form>
+    <p class="text-center mt-4 text-blue-600">Don't have an account? <a href="{{ url_for('register') }}" class="text-blue-500 hover:underline font-medium">Register</a></p>
+</div>
+{% endblock %}

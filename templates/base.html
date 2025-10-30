@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Management System{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Tailwind Config and Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- React and Babel CDNs -->
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.15/babel.min.js"></script>
+    {% block css %}{% endblock %}
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <header class="bg-gradient-to-r from-blue-500 to-blue-700 sticky top-0 z-50 shadow">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex md:hidden">
+                    <button id="hamburger" class="text-white focus:outline-none" aria-label="Open navigation menu" title="Open navigation menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+                <ul id="nav-menu" class="hidden md:flex space-x-4">
+                    <li><a href="{{ url_for('index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Home</a></li>
+                    {% if 'staff' in session %}
+                        <li><a href="{{ url_for('add_student') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Add Student</a></li>
+                        <li><a href="{{ url_for('logout') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Login</a></li>
+                        <li><a href="{{ url_for('register') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow">
+        <!-- React Alerts Container -->
+        <div id="alerts-container" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"></div>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-white border-t border-blue-100 py-4 text-center text-blue-600">
+        <p>© 2025 Student Management System</p>
+    </footer>
+
+    <!-- Prepare alerts data for React -->
+    {% set alerts = [] %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            {% set _ = alerts.append({'id': loop.index, 'category': category, 'message': message}) %}
+        {% endfor %}
+    {% endwith %}
+    <script type="text/babel">
+        function Alerts() {
+            const [alerts, setAlerts] = React.useState({{ alerts|tojson|safe }});
+
+            const closeAlert = (id) => {
+                setAlerts(alerts.filter(alert => alert.id !== id));
+            };
+
+            return (
+                <div>
+                    {alerts.map(alert => (
+                        <div key={alert.id} className={`flex justify-between items-center p-3 rounded-lg mb-4 ${alert.category === 'success' ? 'bg-green-50 border-l-4 border-green-500 text-green-700' : 'bg-red-50 border-l-4 border-red-500 text-red-700'}`}>
+                            <span>{alert.message}</span>
+                            <button onClick={() => closeAlert(alert.id)} className="text-lg font-bold" aria-label="Close alert" title="Close alert">×</button>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<Alerts />, document.getElementById('alerts-container'));
+
+        // Hamburger Menu Toggle
+        document.getElementById('hamburger').addEventListener('click', () => {
+            document.getElementById('nav-menu').classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

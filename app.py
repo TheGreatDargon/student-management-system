@@ -1,8 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import bcrypt
 
 app = Flask(__name__)
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["5 per 10 minutes"],
+    storage_uri="memory://",
+)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'your_secret_key'
@@ -201,6 +209,14 @@ def search_student():
     except ValueError:
         flash('Please enter a valid ID.', 'danger')
     return redirect(url_for('index'))
+
+
+@app.route("/slow")
+@limiter.limit("5 per 10 minutes")
+def slow():
+    return ":("
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

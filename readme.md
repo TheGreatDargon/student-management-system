@@ -1,4 +1,3 @@
-
 # Student Management System
 
 A Flask-based web application for managing student records, featuring a responsive UI built with Tailwind CSS and a React-powered dynamic table. It enables staff to register, log in, and perform complete CRUD operations on student records. Data is securely stored in a SQLite database.
@@ -91,7 +90,7 @@ source env/bin/activate
 ### 3. Install Dependencies
 
 ```bash
-pip install flask flask-sqlalchemy bcrypt
+pip install flask flask-sqlalchemy bcrypt Flask-Limiter
 ```
 
 ### 4. Run the Application
@@ -137,8 +136,8 @@ Access the application at [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ## Routes Overview
 
-| Route          | Description                    |
-| -------------- | ------------------------------ |
+| Route            | Description                    |
+| ---------------- | ------------------------------ |
 | `/`            | Student table (requires login) |
 | `/login`       | Staff login page               |
 | `/register`    | Staff registration page        |

@@ -8,7 +8,7 @@ app = Flask(__name__)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["5 per 10 minutes"],
+    default_limits=["20 per 10 minutes"],
     storage_uri="memory://",
 )
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
@@ -78,10 +78,15 @@ def login():
         username = request.form['username']
         password = request.form['password'].encode('utf-8')
         staff = Staff.query.filter_by(username=username).first()
+        student = Student.query.filter_by(username=username).first()
         if staff and bcrypt.checkpw(password, staff.password):
             session['staff'] = staff.username
             flash('Login successful!', 'success')
             return redirect(url_for('index'))
+        elif student and password:
+                    session['staff'] = student.username
+                    flash('Login successful!', 'success')
+                    return redirect(url_for('index'))
         else:
             flash('Invalid username or password.', 'danger')
     return render_template('login.html')
@@ -218,7 +223,7 @@ def search_student():
 
 
 @app.route("/slow")
-@limiter.limit("5 per 10 minutes")
+@limiter.limit("20 per 10 minutes")
 def slow():
     return ":("
 

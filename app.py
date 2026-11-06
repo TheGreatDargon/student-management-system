@@ -25,6 +25,9 @@ class Class(db.Model):
 # Student Model
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     age = db.Column(db.Integer, nullable=False)
     date_of_birth = db.Column(db.String(10), nullable=False)
@@ -119,6 +122,9 @@ def add_student():
     if request.method == 'POST':
         try:
             new_student = Student(
+                username=request.form['username'],
+                email=request.form['email'],
+                password=request.form['password'],
                 name=request.form['name'],
                 age=int(request.form['age']),
                 date_of_birth=request.form['dateOfBirth'],

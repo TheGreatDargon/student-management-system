@@ -8,7 +8,7 @@ app = Flask(__name__)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["20 per 10 minutes"],
+    default_limits=["200 per day", "50 per hour"],
     storage_uri="memory://",
 )
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
@@ -73,6 +73,7 @@ def index():
     return render_template('table.html', students=students)
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -222,10 +223,6 @@ def search_student():
     return redirect(url_for('index'))
 
 
-@app.route("/slow")
-@limiter.limit("20 per 10 minutes")
-def slow():
-    return ":("
 
 
 

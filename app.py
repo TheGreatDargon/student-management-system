@@ -130,7 +130,7 @@ def add_student():
             new_student = Student(
                 username=request.form['username'],
                 email=request.form['email'],
-                password=request.form['password'],
+                password=bcrypt.hashpw(request.form['password'].encode('utf-8'), bcrypt.gensalt()),
                 name=request.form['name'],
                 age=int(request.form['age']),
                 date_of_birth=request.form['dateOfBirth'],

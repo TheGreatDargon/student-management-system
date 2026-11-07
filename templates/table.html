@@ -26,21 +26,21 @@
         const [students, setStudents] = React.useState([
             {% for student in students %}
     {
-        id: { { student.id } },
-        name: { { student.name | tojson } },
-        age: { { student.age } },
-        date_of_birth: { { student.date_of_birth | tojson } },
-        gender: { { student.gender | tojson } },
-        street: { { student.street | tojson } },
-        city: { { student.city | tojson } },
-        region: { { student.region | tojson } },
-        post_code: { { student.post_code | tojson } },
-        country: { { student.country | tojson } },
-        father_name: { { student.father_name | tojson } },
-        father_number: { { student.father_number | tojson } },
-        mother_name: { { student.mother_name | tojson } },
-        mother_number: { { student.mother_number | tojson } },
-        class_name: { { student.class_.name | tojson } }
+        id: {{ student.id}},
+        name: {{student.name | tojson}},
+        age: {{student.age}},
+        date_of_birth: {{student.date_of_birth | tojson}},
+        gender: {{student.gender | tojson}},
+        street: {{student.street | tojson}},
+        city: {{student.city | tojson}},
+        region: {{student.region | tojson}},
+        post_code: {{student.post_code | tojson}},
+        country: {{student.country | tojson}},
+        father_name: {{student.father_name | tojson}},
+        father_number: {{student.father_number | tojson}},
+        mother_name: {{student.mother_name | tojson}},
+        mother_number: {{student.mother_number | tojson}},
+        class_name: {{student.class_.name | tojson}}
     } {% if not loop.last %}, {% endif %}
     {% endfor %}
         ]);

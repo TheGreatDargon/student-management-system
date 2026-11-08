@@ -41,6 +41,7 @@
         mother_name: {{student.mother_name | tojson}},
         mother_number: {{student.mother_number | tojson}},
         tuition: {{student.tuition | tojson}},
+        total_credits: {{student.total_credits | tojson}},
         class_name: {{student.class_.name | tojson}}
     } {% if not loop.last %}, {% endif %}
     {% endfor %}
@@ -81,11 +82,8 @@
                             { key: 'father_number', label: "Father's Number" },
                             { key: 'mother_name', label: "Mother's Name" },
                             { key: 'mother_number', label: "Mother's Number" },
-<<<<<<< HEAD
                             { key: 'tuition', label: "tuition"},
-=======
                             { key: 'total_credits', label: "Total Credits", isNumeric: true },
->>>>>>> dda12878fb77aa5da7588a8b8ba0a20ce6d8f577
                             { key: null, label: 'Edit' },
                             { key: null, label: 'Delete' }
                         ].map((col, index) => (

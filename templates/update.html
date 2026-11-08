@@ -41,6 +41,11 @@
                     class="mt-1 w-full p-3 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50">
             </div>
             <div>
+                <label for="tuition" class="block text-sm font-medium text-gray-700">Tuition</label>
+                <input type="text" id="tuition" name="tuition" value="{{ datas.tuition }}" required pattern="\d+"
+                    class="mt-1 w-full p-3 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50">
+            </div>
+            <div>
                 <label for="total_credits" class="block text-sm font-medium text-gray-700">Total Credits</label>
                 <input type="text" id="total_credits" name="total_credits" value="{{ datas.total_credits }}" required pattern="\d+"
                     class="mt-1 w-full p-3 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50">

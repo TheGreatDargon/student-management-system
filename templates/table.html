@@ -80,6 +80,7 @@
                             { key: 'father_number', label: "Father's Number" },
                             { key: 'mother_name', label: "Mother's Name" },
                             { key: 'mother_number', label: "Mother's Number" },
+                            { key: 'total_credits', label: "Total Credits", isNumeric: true },
                             { key: null, label: 'Edit' },
                             { key: null, label: 'Delete' }
                         ].map((col, index) => (
@@ -110,6 +111,7 @@
                             <td className="px-4 py-3 text-sm text-gray-700">{student.father_number}</td>
                             <td className="px-4 py-3 text-sm text-gray-700">{student.mother_name}</td>
                             <td className="px-4 py-3 text-sm text-gray-700">{student.mother_number}</td>
+                            <td className="px-4 py-3 text-sm text-gray-700">{student.total_credits}</td>
                             <td className="px-4 py-3">
                                 <a href={`/edit/${student.id}`} className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-transform transform hover:scale-105">Edit</a>
                             </td>

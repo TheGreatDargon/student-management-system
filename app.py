@@ -41,6 +41,7 @@ class Student(db.Model):
     father_number = db.Column(db.String(15), nullable=False)
     mother_name = db.Column(db.String(100), nullable=False)
     mother_number = db.Column(db.String(15), nullable=False)
+    total_credits = db.Column(db.Integer, nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
     class_ = db.relationship('Class', backref='students')
 
@@ -161,6 +162,7 @@ def add_student():
                 father_number=request.form['fatherNumber'],
                 mother_name=request.form['motherName'],
                 mother_number=request.form['motherNumber'],
+                total_credits=request.form['totalCredits'],
                 class_id=int(request.form['class_id'])
             )
             db.session.add(new_student)
@@ -196,6 +198,7 @@ def edit_student(id):
             student.father_number = request.form['fatherNumber']
             student.mother_name = request.form['motherName']
             student.mother_number = request.form['motherNumber']
+            student.total_credits = int(request.form['totalCredits'])
             student.class_id = int(request.form['class_id'])
             db.session.commit()
             flash('Student updated successfully!', 'success')

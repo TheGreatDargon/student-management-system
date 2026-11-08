@@ -68,7 +68,7 @@ with app.app_context():
 def index():
     if 'user' not in session or session.get('role') != 'staff':
         flash('Please login as staff first.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('student_dashboard'))
         
     students = Student.query.all()
     return render_template('table.html', students=students)

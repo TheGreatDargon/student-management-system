@@ -29,7 +29,9 @@
                 <ul id="nav-menu" class="hidden md:flex space-x-4">
                     <li><a href="{{ url_for('index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Home</a></li>
                     {% if 'user' in session %}
-                        <li><a href="{{ url_for('add_student') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Add Student</a></li>
+                        {% if session.get('role') == 'staff' %}
+                            <li><a href="{{ url_for('add_student') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Add Student</a></li>
+                        {% endif %}
                         <li><a href="{{ url_for('logout') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Logout</a></li>
                     {% else %}
                         <li><a href="{{ url_for('login') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Login</a></li>

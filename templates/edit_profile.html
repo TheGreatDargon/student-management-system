@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <h1 class="text-3xl font-bold text-center bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent mb-8">
+        Edit Profile
+    </h1>
+    
+    <form action="{{ url_for('edit_profile') }}" method="POST" class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        <!-- Address Details -->
+        <h3 class="text-lg font-semibold text-blue-600 mb-4">Address Information</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Street</label>
+                <input type="text" name="street" value="{{ student.street }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">City</label>
+                <input type="text" name="city" value="{{ student.city }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Region</label>
+                <input type="text" name="region" value="{{ student.region }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Post Code</label>
+                <input type="text" name="postCode" value="{{ student.post_code }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Country</label>
+                <input type="text" name="country" value="{{ student.country }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+        </div>
+
+        <!-- Parent Contact Info -->
+        <h3 class="text-lg font-semibold text-blue-600 mb-4">Parent Contacts</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Father's Name</label>
+                <input type="text" name="fatherName" value="{{ student.father_name }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Father's Phone</label>
+                <input type="text" name="fatherNumber" value="{{ student.father_number }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Mother's Name</label>
+                <input type="text" name="motherName" value="{{ student.mother_name }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Mother's Phone</label>
+                <input type="text" name="motherNumber" value="{{ student.mother_number }}" required class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+            </div>
+        </div>
+
+        <!-- Security -->
+        <h3 class="text-lg font-semibold text-blue-600 mb-4">Change Password</h3>
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700">New Password (leave blank to keep current)</label>
+            <input type="password" name="password" placeholder="Enter new password" class="mt-1 w-full p-3 border border-blue-100 rounded-lg bg-blue-50">
+        </div>
+
+        <div class="flex justify-center gap-4">
+            <button type="submit" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700">
+                Save Changes
+            </button>
+            <a href="{{ url_for('student_dashboard') }}" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

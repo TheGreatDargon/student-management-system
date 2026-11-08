@@ -28,7 +28,7 @@
                 </div>
                 <ul id="nav-menu" class="hidden md:flex space-x-4">
                     <li><a href="{{ url_for('index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Home</a></li>
-                    {% if 'staff' in session %}
+                    {% if 'user' in session %}
                         <li><a href="{{ url_for('add_student') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Add Student</a></li>
                         <li><a href="{{ url_for('logout') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md">Logout</a></li>
                     {% else %}

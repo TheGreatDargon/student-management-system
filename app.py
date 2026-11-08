@@ -66,28 +66,44 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    if 'staff' not in session:
-        flash('Please login first.', 'danger')
+    if 'user' not in session or session.get('role') != 'staff':
+        flash('Please login as staff first.', 'danger')
         return redirect(url_for('login'))
+        
     students = Student.query.all()
     return render_template('table.html', students=students)
 
+@app.route('/student_dashboard')
+def student_dashboard():
+    if 'user' not in session or session.get('role') != 'student':
+        flash('Please login as a student first.', 'danger')
+        return redirect(url_for('login'))
+        
+    student = Student.query.filter_by(username=session['user']).first()
+    return render_template('student_dashboard.html', student=student)
+
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password'].encode('utf-8')
+        
         staff = Staff.query.filter_by(username=username).first()
         student = Student.query.filter_by(username=username).first()
+        
         if staff and bcrypt.checkpw(password, staff.password):
-            session['staff'] = staff.username
+            session['user'] = staff.username
+            session['role'] = 'staff'
             flash('Login successful!', 'success')
             return redirect(url_for('index'))
-        elif student and password:
-                    session['staff'] = student.username
-                    flash('Login successful!', 'success')
-                    return redirect(url_for('index'))
+            
+        elif student and bcrypt.checkpw(password, student.password):
+            session['user'] = student.username
+            session['role'] = 'student'
+            flash('Login successful!', 'success')
+            return redirect(url_for('student_dashboard')) # Route for students
+            
         else:
             flash('Invalid username or password.', 'danger')
     return render_template('login.html')
@@ -116,13 +132,14 @@ def register():
 
 @app.route('/logout')
 def logout():
-    session.pop('staff', None)
+    session.pop('user', None)
+    session.pop('role', None)
     flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
 
 @app.route('/add_student', methods=['GET', 'POST'])
 def add_student():
-    if 'staff' not in session:
+    if 'user' not in session or session.get('role') != 'staff':
         flash('Please login first.', 'danger')
         return redirect(url_for('login'))
     if request.method == 'POST':
@@ -160,7 +177,7 @@ def add_student():
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_student(id):
-    if 'staff' not in session:
+    if 'user' not in session or session.get('role') != 'staff':
         flash('Please login first.', 'danger')
         return redirect(url_for('login'))
     student = Student.query.get_or_404(id)
@@ -191,9 +208,46 @@ def edit_student(id):
     classes = Class.query.all()
     return render_template('update.html', datas=student, classes=classes)
 
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile():
+    # 1. Authorization check: must be a logged-in student
+    if 'user' not in session or session.get('role') != 'student':
+        flash('Please login as a student first.', 'danger')
+        return redirect(url_for('login'))
+
+    # 2. Retrieve only the current student's record
+    student = Student.query.filter_by(username=session['user']).first_or_404()
+
+    if request.method == 'POST':
+        try:
+            # 3. Update only student-editable fields
+            student.street = request.form['street']
+            student.city = request.form['city']
+            student.region = request.form['region']
+            student.post_code = request.form['postCode']
+            student.country = request.form['country']
+            student.father_name = request.form['fatherName']
+            student.father_number = request.form['fatherNumber']
+            student.mother_name = request.form['motherName']
+            student.mother_number = request.form['motherNumber']
+
+            # Optional: Allow password update if provided
+            new_password = request.form.get('password')
+            if new_password:
+                student.password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('student_dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error updating profile. Please try again.', 'danger')
+
+    return render_template('edit_profile.html', student=student)
+
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete_student(id):
-    if 'staff' not in session:
+    if 'user' not in session or session.get('role') != 'staff':
         flash('Please login first.', 'danger')
         return redirect(url_for('login'))
     student = Student.query.get_or_404(id)
@@ -208,7 +262,7 @@ def delete_student(id):
 
 @app.route('/search', methods=['POST'])
 def search_student():
-    if 'staff' not in session:
+    if 'user' not in session or session.get('role') != 'staff':
         flash('Please login first.', 'danger')
         return redirect(url_for('login'))
     search_id = request.form['search_id']

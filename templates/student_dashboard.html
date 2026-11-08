@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+    <h1 class="text-3xl font-bold mb-6">Welcome, {{ student.name }}!</h1>
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <p><strong>Email:</strong> {{ student.email }}</p>
+        <p><strong>Age:</strong> {{ student.age }}</p>
+        <p><strong>Class:</strong> {{ student.class_.name }}</p>
+        <p><strong>Address:</strong> {{ student.street }}, {{student.city}}</p>
+        <!-- Add other fields as needed -->
+         <a href="{{ url_for('edit_profile') }}" 
+            class="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-transform transform hover:scale-105">
+            Edit Profile
+        </a>
+    </div>
+</div>
+{% endblock %}

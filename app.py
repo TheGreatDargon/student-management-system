@@ -16,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'your_secret_key'
 db = SQLAlchemy(app)
 
+
 # Class Model
 class Class(db.Model):
     __tablename__ = 'class'
@@ -41,6 +42,7 @@ class Student(db.Model):
     father_number = db.Column(db.String(15), nullable=False)
     mother_name = db.Column(db.String(100), nullable=False)
     mother_number = db.Column(db.String(15), nullable=False)
+    tuition = db.Column(db.Integer, nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
     class_ = db.relationship('Class', backref='students')
 
@@ -161,6 +163,7 @@ def add_student():
                 father_number=request.form['fatherNumber'],
                 mother_name=request.form['motherName'],
                 mother_number=request.form['motherNumber'],
+                tuition = request.form['tuition'],
                 class_id=int(request.form['class_id'])
             )
             db.session.add(new_student)
@@ -196,6 +199,7 @@ def edit_student(id):
             student.father_number = request.form['fatherNumber']
             student.mother_name = request.form['motherName']
             student.mother_number = request.form['motherNumber']
+            student.tuition = request.form['tuition']
             student.class_id = int(request.form['class_id'])
             db.session.commit()
             flash('Student updated successfully!', 'success')
@@ -230,6 +234,7 @@ def edit_profile():
             student.father_number = request.form['fatherNumber']
             student.mother_name = request.form['motherName']
             student.mother_number = request.form['motherNumber']
+            student.tuition = request.form['tuition']
 
             # Optional: Allow password update if provided
             new_password = request.form.get('password')

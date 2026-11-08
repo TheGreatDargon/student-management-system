@@ -42,7 +42,11 @@ class Student(db.Model):
     father_number = db.Column(db.String(15), nullable=False)
     mother_name = db.Column(db.String(100), nullable=False)
     mother_number = db.Column(db.String(15), nullable=False)
+<<<<<<< HEAD
     tuition = db.Column(db.Integer, nullable=False)
+=======
+    total_credits = db.Column(db.Integer, nullable=False)
+>>>>>>> dda12878fb77aa5da7588a8b8ba0a20ce6d8f577
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
     class_ = db.relationship('Class', backref='students')
 
@@ -163,7 +167,11 @@ def add_student():
                 father_number=request.form['fatherNumber'],
                 mother_name=request.form['motherName'],
                 mother_number=request.form['motherNumber'],
+<<<<<<< HEAD
                 tuition = request.form['tuition'],
+=======
+                total_credits=request.form['totalCredits'],
+>>>>>>> dda12878fb77aa5da7588a8b8ba0a20ce6d8f577
                 class_id=int(request.form['class_id'])
             )
             db.session.add(new_student)
@@ -199,7 +207,11 @@ def edit_student(id):
             student.father_number = request.form['fatherNumber']
             student.mother_name = request.form['motherName']
             student.mother_number = request.form['motherNumber']
+<<<<<<< HEAD
             student.tuition = request.form['tuition']
+=======
+            student.total_credits = int(request.form['totalCredits'])
+>>>>>>> dda12878fb77aa5da7588a8b8ba0a20ce6d8f577
             student.class_id = int(request.form['class_id'])
             db.session.commit()
             flash('Student updated successfully!', 'success')

@@ -177,12 +177,7 @@ def add_student():
                 father_number=request.form['fatherNumber'],
                 mother_name=request.form['motherName'],
                 mother_number=request.form['motherNumber'],
-<<<<<<< HEAD
-                tuition=request.form['tuition'],
-                total_credits=request.form['total_credits'],
-=======
                 total_credits=int(request.form['total_credits']),
->>>>>>> 0b38166 (Students can no longer access staff dashboard by clicking home, added log file and logging so unathorized access and failed login attempts)
                 class_id=int(request.form['class_id'])
             )
             db.session.add(new_student)

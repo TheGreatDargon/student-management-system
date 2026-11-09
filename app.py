@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from datetime import datetime, timezone
+import copy
 import bcrypt
 
 app = Flask(__name__)
@@ -15,6 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'your_secret_key'
 db = SQLAlchemy(app)
+log_file = "student-management.log"
 
 
 # Class Model
@@ -54,6 +57,10 @@ class Staff(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
 
+def write_to_log(message):
+    with open(log_file, "a") as f:
+        f.write(f"{datetime.now(timezone.utc)}{message}\n")
+
 # Create database and add sample classes
 with app.app_context():
     db.create_all()
@@ -70,6 +77,7 @@ with app.app_context():
 @app.route('/')
 def index():
     if 'user' not in session or session.get('role') != 'staff':
+        write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: '/'")
         flash('Please login as staff first.', 'danger')
         return redirect(url_for('student_dashboard'))
         
@@ -79,6 +87,7 @@ def index():
 @app.route('/student_dashboard')
 def student_dashboard():
     if 'user' not in session or session.get('role') != 'student':
+        write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: 'student_dashboard'")
         flash('Please login as a student first.', 'danger')
         return redirect(url_for('login'))
         
@@ -98,16 +107,19 @@ def login():
         if staff and bcrypt.checkpw(password, staff.password):
             session['user'] = staff.username
             session['role'] = 'staff'
+            write_to_log(f"[LOGIN SUCCESS] {username} successfully logged in. Page: '/login'")
             flash('Login successful!', 'success')
             return redirect(url_for('index'))
             
         elif student and bcrypt.checkpw(password, student.password):
             session['user'] = student.username
             session['role'] = 'student'
+            write_to_log(f"[LOGIN SUCCESS] {username} successfully logged in. Page: '/login'")
             flash('Login successful!', 'success')
             return redirect(url_for('student_dashboard')) # Route for students
             
         else:
+            write_to_log(f"[LOGIN FAILURE] {username} Invalid username or password. Page: '/login'")
             flash('Invalid username or password.', 'danger')
     return render_template('login.html')
 
@@ -143,6 +155,7 @@ def logout():
 @app.route('/add_student', methods=['GET', 'POST'])
 def add_student():
     if 'user' not in session or session.get('role') != 'staff':
+        write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: '/add_student'")
         flash('Please login first.', 'danger')
         return redirect(url_for('login'))
     if request.method == 'POST':
@@ -164,8 +177,12 @@ def add_student():
                 father_number=request.form['fatherNumber'],
                 mother_name=request.form['motherName'],
                 mother_number=request.form['motherNumber'],
+<<<<<<< HEAD
                 tuition=request.form['tuition'],
                 total_credits=request.form['total_credits'],
+=======
+                total_credits=int(request.form['total_credits']),
+>>>>>>> 0b38166 (Students can no longer access staff dashboard by clicking home, added log file and logging so unathorized access and failed login attempts)
                 class_id=int(request.form['class_id'])
             )
             db.session.add(new_student)
@@ -183,6 +200,7 @@ def add_student():
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_student(id):
     if 'user' not in session or session.get('role') != 'staff':
+        write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: '/edit/{id}'")
         flash('Please login first.', 'danger')
         return redirect(url_for('login'))
     student = Student.query.get_or_404(id)
@@ -215,14 +233,20 @@ def edit_student(id):
     classes = Class.query.all()
     return render_template('update.html', datas=student, classes=classes)
 
+EDITABLE_FIELDS = {
+    'street': 'street', 'city': 'city', 'region': 'region',
+    'post_code': 'postCode', 'country': 'country',
+    'father_name': 'fatherName', 'father_number': 'fatherNumber',
+    'mother_name': 'motherName', 'mother_number': 'motherNumber',
+}
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():
-    # 1. Authorization check: must be a logged-in student
     if 'user' not in session or session.get('role') != 'student':
+        write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: '/edit_profile'")
         flash('Please login as a student first.', 'danger')
         return redirect(url_for('login'))
 
-    # 2. Retrieve only the current student's record
     student = Student.query.filter_by(username=session['user']).first_or_404()
 
     if request.method == 'POST':
@@ -239,17 +263,34 @@ def edit_profile():
             student.mother_number = request.form['motherNumber']
             student.tuition = request.form['tuition']
             student.total_credits = request.form['total_credits']
+            old_values = {attr: getattr(student, attr) for attr in EDITABLE_FIELDS}
 
-            # Optional: Allow password update if provided
+            for attr, form_key in EDITABLE_FIELDS.items():
+                setattr(student, attr, request.form[form_key])
+
+            password_changed = False
             new_password = request.form.get('password')
             if new_password:
-                student.password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                student.password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+                password_changed = True
+
+            # Compute the diff BEFORE commit, while values are still loaded
+            differences = {
+                attr: (old_values[attr], getattr(student, attr))
+                for attr in EDITABLE_FIELDS
+                if old_values[attr] != getattr(student, attr)
+            }
 
             db.session.commit()
+
+            if password_changed:
+                differences['password'] = 'changed'
+            write_to_log(f"{student.username} [STUDENT UPDATE] {differences}")
             flash('Profile updated successfully!', 'success')
             return redirect(url_for('student_dashboard'))
         except Exception as e:
             db.session.rollback()
+            write_to_log(f"[STUDENT UPDATE ERROR] {session.get('user')} {e!r}")
             flash('Error updating profile. Please try again.', 'danger')
 
     return render_template('edit_profile.html', student=student)
@@ -257,6 +298,7 @@ def edit_profile():
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete_student(id):
     if 'user' not in session or session.get('role') != 'staff':
+        write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: '/delete/{id}'")
         flash('Please login first.', 'danger')
         return redirect(url_for('login'))
     student = Student.query.get_or_404(id)
@@ -272,6 +314,7 @@ def delete_student(id):
 @app.route('/search', methods=['POST'])
 def search_student():
     if 'user' not in session or session.get('role') != 'staff':
+        write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: '/search'")
         flash('Please login first.', 'danger')
         return redirect(url_for('login'))
     search_id = request.form['search_id']

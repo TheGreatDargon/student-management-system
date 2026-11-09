@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime, timezone
-import copy
 import bcrypt
+import os
 
 app = Flask(__name__)
 limiter = Limiter(
@@ -15,7 +15,7 @@ limiter = Limiter(
 )
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'your_secret_key'
+app.secret_key = os.urandom(32)
 db = SQLAlchemy(app)
 log_file = "student-management.log"
 
@@ -57,6 +57,10 @@ class Staff(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
 
+def clear_log():
+    with open(log_file, "w") as f:
+        pass
+
 def write_to_log(message):
     with open(log_file, "a") as f:
         f.write(f"{datetime.now(timezone.utc)}{message}\n")
@@ -76,7 +80,9 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    if 'user' not in session or session.get('role') != 'staff':
+    if 'user' not in session:
+            return redirect(url_for('login'))
+    if session.get('role') != 'staff':
         write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: '/'")
         flash('Please login as staff first.', 'danger')
         return redirect(url_for('student_dashboard'))
@@ -86,7 +92,9 @@ def index():
 
 @app.route('/student_dashboard')
 def student_dashboard():
-    if 'user' not in session or session.get('role') != 'student':
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    if session.get('role') != 'student':
         write_to_log(f"[UNAUTHORIZED ACCESS ATTEMPT] USER: {session.get('user')} Page: 'student_dashboard'")
         flash('Please login as a student first.', 'danger')
         return redirect(url_for('login'))
@@ -246,18 +254,6 @@ def edit_profile():
 
     if request.method == 'POST':
         try:
-            # 3. Update only student-editable fields
-            student.street = request.form['street']
-            student.city = request.form['city']
-            student.region = request.form['region']
-            student.post_code = request.form['postCode']
-            student.country = request.form['country']
-            student.father_name = request.form['fatherName']
-            student.father_number = request.form['fatherNumber']
-            student.mother_name = request.form['motherName']
-            student.mother_number = request.form['motherNumber']
-            student.tuition = request.form['tuition']
-            student.total_credits = request.form['total_credits']
             old_values = {attr: getattr(student, attr) for attr in EDITABLE_FIELDS}
 
             for attr, form_key in EDITABLE_FIELDS.items():
@@ -269,7 +265,6 @@ def edit_profile():
                 student.password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
                 password_changed = True
 
-            # Compute the diff BEFORE commit, while values are still loaded
             differences = {
                 attr: (old_values[attr], getattr(student, attr))
                 for attr in EDITABLE_FIELDS
@@ -326,4 +321,5 @@ def search_student():
 
 
 if __name__ == '__main__':
+    clear_log()
     app.run(debug=True)

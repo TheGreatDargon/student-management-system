@@ -213,6 +213,7 @@ def edit_student(id):
     if request.method == 'POST':
         try:
             student.name = request.form['name']
+            student.email = request.form['email']
             student.age = int(request.form['age'])
             student.date_of_birth = request.form['dateOfBirth']
             student.gender = request.form['gender']
@@ -226,9 +227,9 @@ def edit_student(id):
             student.mother_name = request.form['motherName']
             student.mother_number = request.form['motherNumber']
             student.tuition = int(request.form['tuition'])
-            student.total_credits = int(request.form['totalCredits'])
-            student.class_id = int(request.form['class_id'])
+            student.total_credits = int(request.form['total_credits'])
             student.gpa = float(request.form['gpa'])
+            student.class_id = int(request.form['class_id'])
             db.session.commit()
             flash('Student updated successfully!', 'success')
             return redirect(url_for('index'))
@@ -269,9 +270,6 @@ def edit_profile():
             student.father_number = request.form['fatherNumber']
             student.mother_name = request.form['motherName']
             student.mother_number = request.form['motherNumber']
-            student.tuition = request.form['tuition']
-            student.total_credits = request.form['total_credits']
-            student.gpa = request.form['gpa']
 
             for attr, form_key in EDITABLE_FIELDS.items():
                 setattr(student, attr, request.form[form_key])

@@ -49,6 +49,7 @@ class Student(db.Model):
     total_credits = db.Column(db.Integer, nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
     class_ = db.relationship('Class', backref='students')
+    gpa = db.Column(db.Float, nullable=False)
 
 # Staff Model
 class Staff(db.Model):
@@ -185,8 +186,10 @@ def add_student():
                 father_number=request.form['fatherNumber'],
                 mother_name=request.form['motherName'],
                 mother_number=request.form['motherNumber'],
-                total_credits=int(request.form['total_credits']),
-                class_id=int(request.form['class_id'])
+                tuition=request.form['tuition'],
+                total_credits=request.form['total_credits'],
+                class_id=int(request.form['class_id']),
+                gpa = request.form['gpa']
             )
             db.session.add(new_student)
             db.session.commit()
@@ -225,6 +228,7 @@ def edit_student(id):
             student.tuition = int(request.form['tuition'])
             student.total_credits = int(request.form['totalCredits'])
             student.class_id = int(request.form['class_id'])
+            student.gpa = float(request.form['gpa'])
             db.session.commit()
             flash('Student updated successfully!', 'success')
             return redirect(url_for('index'))
@@ -255,6 +259,19 @@ def edit_profile():
     if request.method == 'POST':
         try:
             old_values = {attr: getattr(student, attr) for attr in EDITABLE_FIELDS}
+            # 3. Update only student-editable fields
+            student.street = request.form['street']
+            student.city = request.form['city']
+            student.region = request.form['region']
+            student.post_code = request.form['postCode']
+            student.country = request.form['country']
+            student.father_name = request.form['fatherName']
+            student.father_number = request.form['fatherNumber']
+            student.mother_name = request.form['motherName']
+            student.mother_number = request.form['motherNumber']
+            student.tuition = request.form['tuition']
+            student.total_credits = request.form['total_credits']
+            student.gpa = request.form['gpa']
 
             for attr, form_key in EDITABLE_FIELDS.items():
                 setattr(student, attr, request.form[form_key])
